@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Document</title>
+     <%- include('bootstrap') %>
+          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+
+<body>
+
+     <h1 style="text-align:center">Register to Quizzie</h3>
+
+
+          <div class="container mt-2 p-4 shadow-lg">
+               <form action="/register" method="post" autocomplete="off" id="cls">
+                    <div class="row">
+                         <div class="col-md-12 mb-3">
+                              <label for="validationServer01">First name</label>
+                              <input type="text" class="form-control " id="name" placeholder="First name" name="name"
+                                   required>
+                         </div>
+                    </div>
+                    <div class="row">
+                         <div class="col-md-12 mb-3">
+                              <label for="validationServer02">Email</label>
+                              <input type="email" class="form-control " placeholder="abc123@xyz.com" name="email"
+                                   id="emailid" required>
+                         </div>
+                    </div>
+                    <div class="row">
+
+                         <div class="col-md-6 mb-3">
+                              <label for="validationServer03">Password</label>
+                              <input type="password" class="form-control " name="password" id="password1"
+                                   placeholder="Password" required>
+
+                         </div>
+                    </div>
+                    <center><button id="registerButton">Done</button>
+                    </center>
+                    <div class="row">
+                         <a href="/login/1" class="ml-3 btn btn-outline-success">Login from Here?</a>
+                    </div>
+               </form>
+
+          </div>
+
+
+          <!-- <form action="/register" method="post" autocomplete="off">
+               <input type="text" id="name" name="name" placeholder="Enter name" required>
+               <input type="email" id="emailid" name="email" placeholder="Enter email" required>
+               <input type="password" id="password1" name="password" placeholder="Enter password" required>
+               <button id="registerButton">Done</button>
+          </form> -->
+
+</body>
+
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+     document.getElementById("registerButton").addEventListener("click", function (event) {
+
+          event.preventDefault();
+
+          var pwd3 = document.getElementById("password1").value;
+          var name = document.getElementById("name").value;
+          var email = document.getElementById("emailid").value;
+          console.log(email)
+
+          axios.post('/register', { name, email, pwd3 })
+               .then((res) => {
+                    if (res.data.success === "added") {
+                         makeAlert();
+                         document.getElementById("cls").reset();
+                    }
+
+                    else if (res.data.error === "already") {
+                         Swal.fire({
+                              icon: 'error',
+                              title: 'Oops...',
+                              text: 'Already Registered',
+                         })
+                         document.getElementById("cls").reset();
+                    }
+
+                    else if (res.data.error === "empty") {
+
+                         Swal.fire({
+                              icon: 'error',
+                              title: 'Oops...',
+                              text: 'Fill Empty Fields',
+                         })
+                         document.getElementById("cls").reset();
+                    }
+                    else if (res.data.error === "admin") {
+                         Swal.fire({
+                              icon: 'error',
+                              title: 'Oops...',
+                              text: 'Not allowed to registered with this email',
+                         })
+                         document.getElementById("cls").reset();
+                    }
+
+               })
+               .catch((err) => {
+                    console.log(err);
+               })
+     })
+
+</script>
+
+
+<script>
+
+     function makeAlert() {
+          let timerInterval
+          Swal.fire({
+               title: '<h2>Good job!</h2>',
+               html: '<h3>Registered Successfully</h3>',
+               timer: 1000,
+               timerProgressBar: true,
+               onBeforeOpen: () => {
+                    Swal.showLoading()
+                    timerInterval = setInterval(() => {
+                         Swal.getContent().querySelector('b')
+                              .textContent = Swal.getTimerLeft()
+                    }, 100)
+               },
+               onClose: () => {
+                    clearInterval(timerInterval)
+                    location.replace("/login/1");
+               }
+          }).then((result) => {
+               if (
+                    result.dismiss === Swal.DismissReason.timer
+               ) {
+                    console.log('I was closed by the timer')
+               }
+          })
+     }
+</script>
+
+</html>
